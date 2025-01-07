@@ -1,0 +1,35 @@
+from machine import Pin, I2C
+import ssd1306
+import framebuf
+import time
+
+# OLED display dimensions
+SCREEN_WIDTH = 128
+SCREEN_HEIGHT = 64
+
+# I2C setup
+i2c = I2C(0, scl=Pin(22), sda=Pin(21))  # Adjust pins if necessary
+
+# Initialize OLED display
+oled = ssd1306.SSD1306_I2C(SCREEN_WIDTH, SCREEN_HEIGHT, i2c)
+
+# Bitmap image data (DIYables-icon)
+bitmap_image = bytearray([
+    # Add the rest of your bitmap data here...
+])
+
+# Create a framebuffer for the bitmap image
+fb = framebuf.FrameBuffer(bitmap_image, SCREEN_WIDTH, SCREEN_HEIGHT, framebuf.MONO_HLSB)
+
+# Display the bitmap on the OLED
+oled.fill(0)  # Clear display
+oled.blit(fb, 0, 0)  # Draw bitmap at (0, 0)
+oled.show()
+time.sleep(1)
+
+# Invert display periodically
+while True:
+    oled.invert(True)
+    time.sleep(1)
+    oled.invert(False)
+    time.sleep(1)
