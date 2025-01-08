@@ -1,0 +1,51 @@
+import network
+import socket
+
+def connect_wifi(ssid, password):
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    if not wlan.isconnected():
+        print('Connecting to WiFi...')
+        wlan.connect(ssid, password)
+        while not wlan.isconnected():
+            pass
+    print('Network config:', wlan.ifconfig())
+
+def web_page():
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <h1>You Have Been Rick Rolled!</h1>
+    <img src="https://media.tenor.com/x8v1oNUOmg4AAAAM/rickroll-roll.gif" alt="Rickroll GIF">
+    <audio id="myAudio" src="https://www.soundboard.com/track/download/156453" muted autoplay></audio>
+    <script>
+    window.addEventListener('load', () => {
+      const audio = document.getElementById('myAudio');
+      audio.muted = false; // Unmute after autoplay starts
+      audio.play().catch(error => console.error('Autoplay blocked:', error));
+    });
+    </script>
+    </body>
+    </html>"""
+    return html
+
+def start_server():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('', 80))
+    s.listen(5)
+
+    while True:
+        conn, addr = s.accept()
+        print('Got a connection from %s' % str(addr))
+        request = conn.recv(1024)
+        conn.send('HTTP/1.1 200 OK\n')
+        conn.send('Content-Type: text/html\n')
+        conn.send('Connection: close\n\n')
+        conn.sendall(web_page())
+        conn.close()
+
+# Usage
+connect_wifi('{}', '{}')
+start_server()
+
